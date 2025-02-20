@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= titulo %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <%- include('../../partials/navbar') %>
+
+    <div class="dashboard-layout">
+        <%- include('../../partials/sidebar', { user, ademiro, donoditudo }) %>
+
+        <main class="dashboard-content">
+            <div class="content-header">
+                <h1>Gerenciar Staffs</h1>
+                <p>Adicione ou remova membros da equipe</p>
+            </div>
+
+            <div class="content-card">
+                <div class="staff-section">
+                    <h2>Adicionar Staff</h2>
+                    <form class="staff-form" action="/dashboard/admin/staffs/add" method="POST">
+                        <div class="form-group">
+                            <label for="userId">ID do Discord</label>
+                            <input type="text" id="userId" name="userId" required placeholder="Digite o ID do usuário">
+                        </div>
+                        <button type="submit" class="submit-button">Adicionar Staff</button>
+                    </form>
+                </div>
+
+                <div class="staff-section">
+                    <h2>Staffs Atuais</h2>
+                    <div class="staff-list">
+                        <% admins.forEach(adminId => { %>
+                            <div class="staff-item">
+                                <div class="staff-info">
+                                    <span class="staff-id"><%= adminId %></span>
+                                </div>
+                                <form action="/dashboard/admin/staffs/remove" method="POST" class="staff-remove-form">
+                                    <input type="hidden" name="userId" value="<%= adminId %>">
+                                    <button type="submit" class="remove-button">
+                                        <img src="/images/trash-icon.svg" alt="Remover">
+                                    </button>
+                                </form>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/main.js"></script>
+</body>
+</html> 

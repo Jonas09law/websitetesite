@@ -1,0 +1,20 @@
+[
+  {
+    "id": "1740065792321",
+    "scammerName": "Teste",
+    "scammerID": "4222554",
+    "proofType": "print",
+    "proofLink": "http://localhost:5000/dashboard/denunciar",
+    "description": "Fudeu me o cu ",
+    "status": "revoked",
+    "authorId": "1113945518071107705",
+    "authorName": ".vxtz.",
+    "createdAt": "2025-02-20T15:36:32.322Z",
+    "notifications": [],
+    "reviewedBy": ".vxtz.",
+    "reviewedAt": "2025-02-20T15:41:33.140Z",
+    "revokedBy": ".vxtz.",
+    "revokeReason": "Teste123",
+    "revokedAt": "2025-02-20T15:42:14.442Z"
+  }
+]

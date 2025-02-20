@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaxadoS - Termos de Uso</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/termos.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <%- include('./partials/navbar') %>
+
+    <main class="terms-container">
+        <div class="terms-header">
+            <h1>Termos de Uso</h1>
+            <p>Última atualização: <%= moment().format('DD/MM/YYYY') %></p>
+        </div>
+
+        <div class="terms-content">
+            <section class="terms-section">
+                <h2>1. Aceitação dos Termos</h2>
+                <p>Ao acessar e usar o TaxadoS, você concorda em cumprir estes termos de uso. Se você não concordar com qualquer parte destes termos, não use nosso serviço.</p>
+            </section>
+
+            <section class="terms-section">
+                <h2>2. Descrição do Serviço</h2>
+                <p>O TaxadoS é uma plataforma de denúncias que permite aos usuários reportar e consultar informações sobre possíveis golpistas na comunidade. Nosso objetivo é criar um ambiente mais seguro para todos.</p>
+            </section>
+
+            <section class="terms-section">
+                <h2>3. Responsabilidades do Usuário</h2>
+                <ul>
+                    <li>Fornecer informações verdadeiras e precisas nas denúncias</li>
+                    <li>Não usar a plataforma para difamação ou perseguição</li>
+                    <li>Manter suas credenciais de acesso seguras</li>
+                    <li>Respeitar as diretrizes da comunidade</li>
+                </ul>
+            </section>
+
+            <section class="terms-section">
+                <h2>4. Denúncias</h2>
+                <p>Ao submeter uma denúncia, você:</p>
+                <ul>
+                    <li>Garante que as informações são verdadeiras</li>
+                    <li>Fornece provas concretas do ocorrido</li>
+                    <li>Aceita que a denúncia será revisada pela equipe</li>
+                    <li>Entende que denúncias falsas resultarão em banimento</li>
+                </ul>
+            </section>
+
+            <section class="terms-section">
+                <h2>5. Privacidade e Dados</h2>
+                <p>Coletamos e processamos dados conforme nossa Política de Privacidade. Ao usar o TaxadoS, você concorda com nossas práticas de processamento de dados.</p>
+            </section>
+
+            <section class="terms-section">
+                <h2>6. Limitação de Responsabilidade</h2>
+                <p>O TaxadoS não se responsabiliza por:</p>
+                <ul>
+                    <li>Precisão das informações fornecidas pelos usuários</li>
+                    <li>Perdas ou danos resultantes do uso da plataforma</li>
+                    <li>Disputas entre usuários</li>
+                    <li>Conteúdo externo linkado na plataforma</li>
+                </ul>
+            </section>
+
+            <section class="terms-section">
+                <h2>7. Modificações dos Termos</h2>
+                <p>Reservamos o direito de modificar estes termos a qualquer momento. Alterações significativas serão notificadas aos usuários.</p>
+            </section>
+
+            <section class="terms-section">
+                <h2>8. Encerramento de Conta</h2>
+                <p>Reservamos o direito de suspender ou encerrar contas que violem estes termos ou prejudiquem a comunidade.</p>
+            </section>
+        </div>
+    </main>
+</body>
+</html> 

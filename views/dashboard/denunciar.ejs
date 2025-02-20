@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= titulo %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <%- include('../partials/navbar') %>
+
+    <div class="dashboard-layout">
+        <%- include('../partials/sidebar', { user, ademiro, donoditudo }) %>
+
+        <main class="dashboard-content">
+            <div class="content-header">
+                <h1>Fazer Denúncia</h1>
+                <p>Denuncie um scammer para nossa equipe avaliar</p>
+            </div>
+
+            <div class="content-card">
+                <form class="denuncia-form" action="/dashboard/denunciar" method="POST">
+                    <div class="form-group">
+                        <label for="scammerName">Nome do Scammer</label>
+                        <input type="text" id="scammerName" name="scammerName" required placeholder="Nome do usuário que aplicou o golpe">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="scammerID">ID do Discord do Scammer</label>
+                        <input type="text" id="scammerID" name="scammerID" required placeholder="ID do usuário (Ex: 123456789)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="proofType">Tipo de Prova</label>
+                        <select id="proofType" name="proofType" required>
+                            <option value="">Selecione o tipo de prova</option>
+                            <option value="print">Print de Conversa</option>
+                            <option value="video">Vídeo</option>
+                            <option value="audio">Áudio</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="proofLink">Link da Prova</label>
+                        <input type="url" id="proofLink" name="proofLink" required placeholder="Link do print/vídeo/áudio (imgur, youtube, etc)">
+                        <small>Use sites de hospedagem de imagens/vídeos como imgur.com ou youtube.com</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Descrição Detalhada</label>
+                        <textarea id="description" name="description" required placeholder="Descreva detalhadamente como aconteceu o golpe" rows="5"></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-button">Enviar Denúncia</button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <style>
+    #toast-container {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .toast {
+        min-width: 300px;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(17,17,17,0.95) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(10px);
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transform: translateX(120%);
+        opacity: 0;
+        animation: slideIn 0.3s ease forwards;
+    }
+
+    .toast.error {
+        border-left: 4px solid #ef4444;
+    }
+
+    .toast.success {
+        border-left: 4px solid #22c55e;
+    }
+
+    .toast-icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .toast-content {
+        flex: 1;
+    }
+
+    .toast-title {
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .toast-message {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .toast-close {
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        color: rgba(255, 255, 255, 0.6);
+        transition: color 0.3s ease;
+    }
+
+    .toast-close:hover {
+        color: white;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(120%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(120%);
+            opacity: 0;
+        }
+    }
+    </style>
+
+    <script>
+    function mostraNotificacao(tipo, titulo, msg, tempo = 5000) {
+        const container = document.getElementById('toast-container');
+        
+        const toast = document.createElement('div');
+        toast.className = `toast ${tipo}`;
+        
+        const icone = tipo === 'error' ? 
+            '<svg class="toast-icon" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="#ef4444"/></svg>' :
+            '<svg class="toast-icon" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#22c55e"/></svg>';
+        
+        toast.innerHTML = `
+            ${icone}
+            <div class="toast-content">
+                <div class="toast-title">${titulo}</div>
+                <div class="toast-message">${msg}</div>
+            </div>
+            <button class="toast-close" onclick="this.parentElement.remove()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"/>
+                </svg>
+            </button>
+        `;
+        
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, tempo);
+    }
+
+    document.querySelector('.denuncia-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const dados = new FormData(e.target);
+        const idDoScammer = dados.get('scammerID');
+        
+        const listaDenuncias = <%- JSON.stringify(denuncias) %>;
+        const jaExiste = listaDenuncias.find(d => 
+            d.scammerID === idDoScammer && 
+            (d.status === 'approved' || d.status === 'pending')
+        );
+        
+        if (jaExiste) {
+            if (jaExiste.status === 'approved') {
+                mostraNotificacao(
+                    'error',
+                    'Usuário já denunciado',
+                    'Este usuário já está na lista de scammers confirmados.'
+                );
+            } else {
+                mostraNotificacao(
+                    'error',
+                    'Denúncia pendente',
+                    'Já existe uma denúncia pendente para este usuário.'
+                );
+            }
+            return;
+        }
+        
+        try {
+            const resposta = await fetch('/dashboard/denunciar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(Object.fromEntries(dados))
+            });
+            
+            if (resposta.ok) {
+                mostraNotificacao(
+                    'success',
+                    'Denúncia enviada',
+                    'Sua denúncia foi enviada com sucesso e será analisada pela equipe.'
+                );
+                setTimeout(() => {
+                    window.location.href = '/dashboard/minhas-denuncias';
+                }, 2000);
+            } else {
+                const erro = await resposta.json();
+                mostraNotificacao('error', 'Erro', erro.error || 'Erro ao enviar denúncia');
+            }
+        } catch (erro) {
+            mostraNotificacao('error', 'Erro', 'Erro ao enviar denúncia');
+        }
+    });
+    </script>
+</body>
+</html> 

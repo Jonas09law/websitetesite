@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= titulo %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <%- include('../partials/navbar') %>
+
+    <div class="dashboard-layout">
+        <%- include('../partials/sidebar', { user, ademiro, donoditudo }) %>
+
+        <main class="dashboard-content">
+            <div class="content-header">
+                <h1>Minhas Denúncias</h1>
+                <p>Acompanhe o status das suas denúncias</p>
+            </div>
+
+            <div class="content-card">
+                <div class="minhas-denuncias-list">
+                    <% if (denuncias.length > 0) { %>
+                        <% denuncias.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(denuncia => { %>
+                            <div class="denuncia-card <%= denuncia.status %>">
+                                <div class="denuncia-header">
+                                    <div class="denuncia-info">
+                                        <span class="denuncia-status">
+                                            <%= denuncia.status === 'pending' ? 'Pendente' : 
+                                               denuncia.status === 'approved' ? 'Aprovada' : 'Reprovada' %>
+                                        </span>
+                                        <span class="denuncia-date">
+                                            <%= moment(denuncia.createdAt).fromNow() %>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="denuncia-content">
+                                    <div class="denuncia-field">
+                                        <label>Scammer</label>
+                                        <p><%= denuncia.scammerName %> (ID: <%= denuncia.scammerID %>)</p>
+                                    </div>
+
+                                    <div class="denuncia-field">
+                                        <label>Tipo de Prova</label>
+                                        <p><%= denuncia.proofType %></p>
+                                    </div>
+
+                                    <div class="denuncia-field">
+                                        <label>Link da Prova</label>
+                                        <a href="<%= denuncia.proofLink %>" target="_blank" class="proof-link">Ver prova</a>
+                                    </div>
+
+                                    <div class="denuncia-field">
+                                        <label>Descrição</label>
+                                        <p class="denuncia-description"><%= denuncia.description %></p>
+                                    </div>
+
+                                    <% if (denuncia.status !== 'pending') { %>
+                                        <div class="review-info">
+                                            <p>
+                                                <%= denuncia.status === 'approved' ? 'Aprovada' : 'Reprovada' %> 
+                                                por <%= denuncia.reviewedBy %> 
+                                                <%= moment(denuncia.reviewedAt).fromNow() %>
+                                            </p>
+                                            <% if (denuncia.reason) { %>
+                                                <p class="review-reason">Motivo: <%= denuncia.reason %></p>
+                                            <% } %>
+                                        </div>
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="empty-state">
+                            <img src="/images/report-icon.svg" alt="Sem denúncias">
+                            <h3>Nenhuma denúncia realizada</h3>
+                            <p>Você ainda não fez nenhuma denúncia.</p>
+                            <a href="/dashboard/denunciar" class="submit-button">Fazer Denúncia</a>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/main.js"></script>
+</body>
+</html> 

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= titulo %></title>
+    
+
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: 'unsafe-inline' 'unsafe-eval'">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <% if (typeof extraCss !== 'undefined') { %>
+        <link rel="stylesheet" href="<%= extraCss %>">
+    <% } %>
+    
+    <script src="/js/security.js"></script>
+    
+    <script>
+        (function(){
+            const _0x4f52=['charCodeAt','fromCharCode'];
+            (function(_0x50c11f,_0x4f52d3){
+                const _0x37b4c1=function(_0x1c361d){
+                    while(--_0x1c361d){
+                        _0x50c11f['push'](_0x50c11f['shift']());
+                    }
+                };
+                _0x37b4c1(++_0x4f52d3);
+            }(_0x4f52,0x1c9));
+        }());
+    </script>
+</head>
+<body> 

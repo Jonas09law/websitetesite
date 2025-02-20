@@ -1,0 +1,20 @@
+Oi baitola, muda na linha 11 do server.js o seu_tokenmaluco pelo token do seu bot.
+Você precisa alterar as seguintes informações no arquivo server.js:
+
+1. Linha 11: Substitua 'seu_tokenmaluco' pelo token do seu bot do Discord
+const seu_tokenmaluco = 'COLOQUE_SEU_TOKEN_AQUI';
+
+2. Linha 38-40: Altere as credenciais do Discord OAuth2:
+const DISCORD_CLIENT_ID = 'SEU_CLIENT_ID'; 
+const DISCORD_CLIENT_SECRET = 'SEU_CLIENT_SECRET';
+const CALLBACK_URL = 'http://localhost:5000/auth/discord/callback';
+
+Para obter essas informações:
+
+1. Acesse o Portal de Desenvolvedores do Discord (discord.com/developers)
+2. Crie uma nova aplicação ou selecione uma existente
+3. Na seção "Bot", clique em "Reset Token" para gerar um novo token
+4. Na seção "OAuth2", você encontrará o Client ID e Client Secret
+5. Configure a URL de callback nas configurações OAuth2
+
+Importante: Nunca compartilhe seu token ou client secret publicamente!

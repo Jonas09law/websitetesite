@@ -1,0 +1,37 @@
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <h3>Geral</h3>
+        <a href="/dashboard/denunciar" class="sidebar-item <%= path === '/dashboard/denunciar' ? 'active' : '' %>">
+            <img src="/images/report-icon.svg" alt="Denunciar">
+            Denunciar
+        </a>
+        <a href="/dashboard/minhas-denuncias" class="sidebar-item <%= path === '/dashboard/minhas-denuncias' ? 'active' : '' %>">
+            <img src="/images/list-icon.svg" alt="Minhas Denúncias">
+            Suas denúncias
+        </a>
+    </div>
+
+    <% if (ademiro) { %>
+    <div class="sidebar-section">
+        <h3>Administração</h3>
+        <a href="/dashboard/admin/denuncias" class="sidebar-item <%= path === '/dashboard/admin/denuncias' ? 'active' : '' %>">
+            <img src="/images/report-icon.svg" alt="Denúncias">
+            Denúncias
+        </a>
+        <a href="/dashboard/admin/scammers" class="sidebar-item <%= path === '/dashboard/admin/scammers' ? 'active' : '' %>">
+            <img src="/images/shield-check.svg" alt="Scammers">
+            Scammers
+        </a>
+        <% if (donoditudo) { %>
+        <a href="/dashboard/admin/staffs" class="sidebar-item <%= path === '/dashboard/admin/staffs' ? 'active' : '' %>">
+            <img src="/images/staff-icon.svg" alt="Staffs">
+            Gerenciar Staffs
+        </a>
+        <% } %>
+        <a href="/dashboard/admin/parceiros" class="sidebar-item <%= path === '/dashboard/admin/parceiros' ? 'active' : '' %>">
+            <img src="/images/partner-icon.svg" alt="Parceiros">
+            Adicionar Parceiro
+        </a>
+    </div>
+    <% } %>
+</aside> 

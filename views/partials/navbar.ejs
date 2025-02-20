@@ -1,0 +1,85 @@
+<nav class="navbar">
+    <div class="nav-left">
+        <div class="logo">
+            <img src="/images/logo.svg" alt="Logo">
+            TaxadoS
+        </div>
+    </div>
+    <div class="nav-center">
+        <a href="/" class="nav-link">Início</a>
+        <a href="/scammers" class="nav-link">Scammers</a>
+        <a href="/termos" class="nav-link">Termos</a>
+        <a href="/parceiros" class="nav-link">Parceiros</a>
+    </div>
+    <div class="nav-right">
+        <a href="/discord" class="nav-link">Discord</a>
+        <div class="notifications" id="notifications">
+            <button class="notifications-button">
+                <img src="/images/bell-icon.svg" alt="Notificações">
+                <% if (user) { %>
+                    <% const unreadCount = notifications.filter(n => !n.read && (n.type === 'all' || (n.type === 'user' && n.userId === user.id) || (n.type === 'staff' && ademiro))).length %>
+                    <% if (unreadCount > 0) { %>
+                        <span class="notification-badge"><%= unreadCount %></span>
+                    <% } %>
+                <% } %>
+            </button>
+            <div class="notifications-dropdown">
+                <div class="notifications-header">
+                    <span class="notifications-title">Notificações</span>
+                    <button class="mark-all-read">Marcar todas como lidas</button>
+                </div>
+                <div class="notifications-list">
+                    <% if (user) { %>
+                        <% const userNotifications = notifications
+                            .filter(n => n.type === 'all' || (n.type === 'user' && n.userId === user.id) || (n.type === 'staff' && ademiro))
+                            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) %>
+                        
+                        <% if (userNotifications.length > 0) { %>
+                            <% userNotifications.forEach(notification => { %>
+                                <div class="notification-item <%= !notification.read ? 'notification-unread' : '' %>" data-id="<%= notification.id %>">
+                                    <div class="notification-title"><%= notification.title %></div>
+                                    <div class="notification-message"><%= notification.message %></div>
+                                    <div class="notification-time"><%= moment(notification.createdAt).fromNow() %></div>
+                                </div>
+                            <% }) %>
+                        <% } else { %>
+                            <div class="notifications-empty">
+                                <img src="/images/bell-off.svg" alt="Sem notificações">
+                                <p>Nenhuma notificação no momento</p>
+                            </div>
+                        <% } %>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        <% if (user) { %>
+            <div class="user-profile" id="userProfile">
+                <img src="<%= user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : '/images/default-avatar.png' %>" alt="Avatar" class="avatar">
+                <div class="dropdown-menu">
+                    <div class="dropdown-header">
+                        <div class="user-info">
+                            <img src="<%= user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : '/images/default-avatar.png' %>" alt="Avatar" class="avatar">
+                            <div class="user-details">
+                                <span class="user-name"><%= user.username %></span>
+                                <span class="user-email"><%= user.email %></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dropdown-items">
+                        <a href="/dashboard" class="dropdown-item">
+                            <img src="/images/dashboard-icon.svg" alt="Dashboard">
+                            Dashboard
+                        </a>
+                        <a href="/logout" class="dropdown-item danger">
+                            <img src="/images/logout-icon.svg" alt="Logout">
+                            Sair
+                        </a>
+                    </div>
+                </div>
+            </div>
+        <% } else { %>
+            <a href="/login" class="login-button">Login</a>
+        <% } %>
+    </div>
+</nav> 
+</nav> 

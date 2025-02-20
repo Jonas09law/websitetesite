@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= titulo %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <%- include('./partials/navbar') %>
+
+    <main>
+        <div class="hero-section">
+            <h1>Nossos Parceiros</h1>
+            <p class="subtitle">Conheça os servidores que fazem parte da nossa comunidade</p>
+        </div>
+
+        <div class="partners-grid">
+            <% parceiros.forEach(parceiro => { %>
+                <div class="partner-card">
+                    <img src="<%= parceiro.serverImage %>" alt="<%= parceiro.name %>" class="partner-image">
+                    <div class="partner-card-content">
+                        <h3><%= parceiro.name %></h3>
+                        <a href="<%= parceiro.serverInvite %>" target="_blank" class="partner-join">
+                            <img src="/images/discord-icon.svg" alt="Discord">
+                            Entrar no Servidor
+                        </a>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </main>
+
+    <script src="/js/main.js"></script>
+</body>
+</html> 

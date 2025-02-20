@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= titulo %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script>
+        moment.locale('pt-br');
+    </script>
+</head>
+<body>
+    <%- include('../../partials/navbar') %>
+
+    <div class="dashboard-layout">
+        <%- include('../../partials/sidebar', { user, ademiro, donoditudo }) %>
+
+        <main class="dashboard-content">
+            <div class="content-header">
+                <h1>Gerenciar Scammers</h1>
+                <p>Gerencie os scammers confirmados no sistema</p>
+            </div>
+
+            <div class="content-card">
+                <div class="scammers-admin-list">
+                    <% if (denuncias.length > 0) { %>
+                        <% denuncias.forEach(denuncia => { %>
+                            <div class="scammer-admin-card">
+                                <div class="scammer-info">
+                                    <img src="<%= denuncia.avatarUrl %>" 
+                                         alt="Avatar" 
+                                         class="scammer-avatar">
+                                    <div class="scammer-details">
+                                        <h3><%= denuncia.scammerName %></h3>
+                                        <span class="scammer-id">ID: <%= denuncia.scammerID %></span>
+                                        <span class="scammer-date">Adicionado <%= moment(denuncia.reviewedAt).format('DD/MM/YYYY') %></span>
+                                    </div>
+                                </div>
+
+                                <div class="scammer-content">
+                                    <div class="proof-section">
+                                        <h4>Prova</h4>
+                                        <% if (denuncia.proofType === 'print') { %>
+                                            <img src="<%= denuncia.proofLink %>" alt="Prova" class="proof-thumbnail">
+                                        <% } else { %>
+                                            <a href="<%= denuncia.proofLink %>" target="_blank" class="proof-link">
+                                                Ver <%= denuncia.proofType %>
+                                            </a>
+                                        <% } %>
+                                    </div>
+
+                                    <div class="description-section">
+                                        <h4>Motivo</h4>
+                                        <p><%= denuncia.description %></p>
+                                    </div>
+                                </div>
+
+                                <div class="scammer-actions">
+                                    <button class="edit-button" onclick="location.href='/dashboard/admin/scammers/<%= denuncia.id %>/edit'">
+                                        <img src="/images/edit-icon.svg" alt="Editar">
+                                        Editar
+                                    </button>
+                                    <button class="revoke-button" onclick="openRevokeModal('<%= denuncia.id %>', '<%= denuncia.scammerName %>')">
+                                        <img src="/images/shield-off.svg" alt="Revogar">
+                                        Revogar
+                                    </button>
+                                    <button class="details-button" onclick="openDetailsModal('<%= denuncia.id %>')">
+                                        <img src="/images/details-icon.svg" alt="Ver detalhes">
+                                        Ver detalhes
+                                    </button>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="empty-state">
+                            <img src="/images/shield-check.svg" alt="Nenhum scammer">
+                            <h3>Nenhum scammer confirmado</h3>
+                            <p>No momento não há scammers confirmados no sistema.</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="revokeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Revogar Scammer</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="revoke-warning">
+                    Tem certeza que deseja revogar <strong id="scammerName"></strong> da lista de scammers?
+                    Esta ação não pode ser desfeita.
+                </p>
+                <form id="revokeForm" action="" method="POST">
+                    <div class="form-group">
+                        <label for="reason">Motivo da Revogação</label>
+                        <textarea id="reason" name="reason" required 
+                                placeholder="Explique o motivo da revogação"></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="cancel-button" onclick="closeRevokeModal()">Cancelar</button>
+                        <button type="submit" class="confirm-button">Confirmar Revogação</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detalhes do Scammer</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-avatar">
+                    <img src="" alt="Avatar" class="proof-image">
+                </div>
+                <div class="modal-details">
+                    <h3 class="modal-scammer-name"></h3>
+                    <span class="modal-scammer-id"></span>
+                    <span class="modal-date"></span>
+                </div>
+                <div class="modal-proof"></div>
+                <div class="modal-description"></div>
+                <div class="modal-reporter"></div>
+                <div class="modal-reviewer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script>
+        function openDetailsModal(denunciaId) {
+            const denuncia = <%- JSON.stringify(denuncias) %>.find(d => d.id === denunciaId);
+            const modal = document.getElementById('detailsModal');
+            
+            modal.querySelector('.modal-avatar').src = denuncia.avatarUrl;
+            modal.querySelector('.modal-scammer-name').textContent = denuncia.scammerName;
+            modal.querySelector('.modal-scammer-id').textContent = `ID: ${denuncia.scammerID}`;
+            
+            const proofContainer = modal.querySelector('.modal-proof');
+            if (denuncia.proofType === 'print') {
+                proofContainer.innerHTML = `<img src="${denuncia.proofLink}" alt="Prova" class="proof-image">`;
+            } else {
+                proofContainer.innerHTML = `<a href="${denuncia.proofLink}" target="_blank" class="proof-link">Ver ${denuncia.proofType}</a>`;
+            }
+            
+            modal.querySelector('.modal-description').textContent = denuncia.description;
+            modal.querySelector('.modal-reporter').textContent = `Reportado por ${denuncia.authorName}`;
+            modal.querySelector('.modal-reviewer').textContent = `Aprovado por ${denuncia.reviewedBy}`;
+            modal.querySelector('.modal-date').textContent = `Data: ${moment(denuncia.reviewedAt).format('DD/MM/YYYY HH:mm')}`;
+            
+            modal.classList.add('active');
+        }
+
+        function openRevokeModal(scammerId, scammerName) {
+            const modal = document.getElementById('revokeModal');
+            const nameElement = document.getElementById('scammerName');
+            const form = document.getElementById('revokeForm');
+            
+            nameElement.textContent = scammerName;
+            form.action = `/dashboard/admin/scammers/${scammerId}/revoke`;
+            modal.classList.add('active');
+        }
+
+        function closeRevokeModal() {
+            document.getElementById('revokeModal').classList.remove('active');
+        }
+
+        document.querySelector('.close-modal')?.addEventListener('click', () => {
+            document.getElementById('detailsModal').classList.remove('active');
+        });
+
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('detailsModal');
+            const revokeModal = document.getElementById('revokeModal');
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+            if (e.target === revokeModal) {
+                revokeModal.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html> 

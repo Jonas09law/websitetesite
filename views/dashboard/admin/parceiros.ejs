@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= titulo %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <%- include('../../partials/navbar') %>
+
+    <div class="dashboard-layout">
+        <%- include('../../partials/sidebar', { user, ademiro, donoditudo }) %>
+
+        <main class="dashboard-content">
+            <div class="content-header">
+                <h1>Gerenciar Parceiros</h1>
+                <p>Adicione ou remova parceiros do sistema</p>
+            </div>
+
+            <div class="content-card">
+                <div class="partner-section">
+                    <h2>Adicionar Parceiro</h2>
+                    <form class="partner-form" action="/dashboard/admin/parceiros/add" method="POST">
+                        <div class="form-group">
+                            <label for="name">Nome do Servidor</label>
+                            <input type="text" id="name" name="name" required placeholder="Digite o nome do servidor">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="serverImage">URL da Imagem do Servidor</label>
+                            <input type="url" id="serverImage" name="serverImage" required placeholder="URL da imagem/logo do servidor">
+                            <small>Link direto para a imagem (PNG, JPG)</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="discordId">ID do Dono</label>
+                            <input type="text" id="discordId" name="discordId" required placeholder="ID do dono do servidor">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="serverInvite">Link de Convite</label>
+                            <input type="url" id="serverInvite" name="serverInvite" required placeholder="discord.gg/seuservidor">
+                            <small>Link permanente de convite do servidor</small>
+                        </div>
+
+                        <button type="submit" class="submit-button">Adicionar Parceiro</button>
+                    </form>
+                </div>
+
+                <div class="partner-section">
+                    <h2>Parceiros Atuais</h2>
+                    <div class="partner-list">
+                        <% parceiros.forEach(parceiro => { %>
+                            <div class="partner-item">
+                                <div class="partner-info">
+                                    <h3 class="partner-name"><%= parceiro.name %></h3>
+                                    <span class="partner-details">ID: <%= parceiro.discordId %></span>
+                                    <a href="<%= parceiro.serverInvite %>" target="_blank" class="partner-link">
+                                        <img src="/images/discord-icon.svg" alt="Discord">
+                                        Entrar no Servidor
+                                    </a>
+                                </div>
+                                <div class="partner-actions">
+                                    <a href="/dashboard/admin/parceiros/edit/<%= parceiro.discordId %>" class="edit-button">
+                                        <img src="/images/edit-icon.svg" alt="Editar">
+                                    </a>
+                                    <form action="/dashboard/admin/parceiros/remove" method="POST" class="partner-remove-form">
+                                        <input type="hidden" name="discordId" value="<%= parceiro.discordId %>">
+                                        <button type="submit" class="remove-button">
+                                            <img src="/images/trash-icon.svg" alt="Remover">
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/main.js"></script>
+</body>
+</html> 

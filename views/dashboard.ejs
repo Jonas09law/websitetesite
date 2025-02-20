@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= titulo %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <%- include('./partials/navbar') %>
+
+    <div class="dashboard-layout">
+        <%- include('./partials/sidebar', { user, ademiro, donoditudo }) %>
+
+        <main class="dashboard-content">
+            <div class="welcome-section">
+                <h1>Bem-vindo, <%= user.username %>!</h1>
+                <p>Ajude a manter nossa comunidade segura</p>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <img src="/images/report-icon.svg" alt="Denunciar">
+                    <h3>Denunciar Scammer</h3>
+                    <p>Encontrou alguém aplicando golpes? Denuncie para nossa equipe avaliar.</p>
+                    <a href="/dashboard/denunciar" class="card-button">
+                        Fazer Denúncia
+                        <img src="/images/arrow-right.svg" alt="→">
+                    </a>
+                </div>
+
+                <div class="dashboard-card">
+                    <img src="/images/list-icon.svg" alt="Minhas Denúncias">
+                    <h3>Minhas Denúncias</h3>
+                    <p>Acompanhe o status das suas denúncias e veja o histórico.</p>
+                    <a href="/dashboard/minhas-denuncias" class="card-button">
+                        Ver Denúncias
+                        <img src="/images/arrow-right.svg" alt="→">
+                    </a>
+                </div>
+
+                <div class="dashboard-card">
+                    <img src="/images/shield-check.svg" alt="Scammers">
+                    <h3>Lista de Scammers</h3>
+                    <p>Veja a lista completa de scammers confirmados pela equipe.</p>
+                    <a href="/scammers" class="card-button">
+                        Ver Lista
+                        <img src="/images/arrow-right.svg" alt="→">
+                    </a>
+                </div>
+
+                <div class="dashboard-card">
+                    <img src="/images/discord-icon.svg" alt="Discord">
+                    <h3>Comunidade Discord</h3>
+                    <p>Participe do nosso servidor e fique por dentro das novidades.</p>
+                    <a href="/discord" class="card-button">
+                        Entrar no Discord
+                        <img src="/images/arrow-right.svg" alt="→">
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/main.js"></script>
+</body>
+</html> 

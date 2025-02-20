@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= titulo %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <%- include('../../partials/navbar') %>
+
+    <div class="dashboard-layout">
+        <%- include('../../partials/sidebar', { user, ademiro, donoditudo }) %>
+
+        <main class="dashboard-content">
+            <div class="content-header">
+                <h1>Gerenciar Denúncias</h1>
+                <p>Revise e modere as denúncias da comunidade</p>
+            </div>
+
+            <div class="content-card">
+                <div class="bulk-actions">
+                    <div class="select-all">
+                        <input type="checkbox" id="selectAll" class="checkbox">
+                        <label for="selectAll">Selecionar Todas</label>
+                    </div>
+                    
+                    <div class="bulk-buttons">
+                        <button class="bulk-approve" onclick="bulkApprove()" disabled>
+                            <img src="/images/check-icon.svg" alt="Aprovar">
+                            Aprovar Selecionadas
+                        </button>
+                        <button class="bulk-reject" onclick="bulkReject()" disabled>
+                            <img src="/images/x-icon.svg" alt="Reprovar">
+                            Reprovar Selecionadas
+                        </button>
+                    </div>
+                </div>
+
+                <div class="denuncias-list">
+                    <% denuncias.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(denuncia => { %>
+                        <div class="denuncia-card <%= denuncia.status === 'pending' ? 'selectable' : '' %>">
+                            <% if (denuncia.status === 'pending') { %>
+                                <div class="denuncia-select">
+                                    <input type="checkbox" class="denuncia-checkbox" data-id="<%= denuncia.id %>">
+                                </div>
+                            <% } %>
+                            <div class="denuncia-header">
+                                <div class="denuncia-info">
+                                    <span class="denuncia-status <%= denuncia.status %>">
+                                        <%= denuncia.status === 'pending' ? 'Pendente' : 
+                                           denuncia.status === 'approved' ? 'Aprovada' : 'Reprovada' %>
+                                    </span>
+                                    <span class="denuncia-date">
+                                        <%= moment(denuncia.createdAt).fromNow() %>
+                                    </span>
+                                </div>
+                                <div class="denuncia-author">
+                                    por <%= denuncia.authorName %>
+                                </div>
+                            </div>
+
+                            <div class="denuncia-content">
+                                <div class="denuncia-field">
+                                    <label>Scammer</label>
+                                    <p><%= denuncia.scammerName %> (ID: <%= denuncia.scammerID %>)</p>
+                                </div>
+
+                                <div class="denuncia-field">
+                                    <label>Tipo de Prova</label>
+                                    <p><%= denuncia.proofType %></p>
+                                </div>
+
+                                <div class="denuncia-field">
+                                    <label>Link da Prova</label>
+                                    <a href="<%= denuncia.proofLink %>" target="_blank" class="proof-link">Ver prova</a>
+                                </div>
+
+                                <div class="denuncia-field">
+                                    <label>Descrição</label>
+                                    <p class="denuncia-description"><%= denuncia.description %></p>
+                                </div>
+
+                                <% if (denuncia.status === 'pending') { %>
+                                    <div class="denuncia-actions">
+                                        <form action="/dashboard/admin/denuncias/<%= denuncia.id %>/status" method="POST" class="denuncia-form">
+                                            <input type="hidden" name="status" value="approved">
+                                            <button type="submit" class="approve-button">Aprovar</button>
+                                        </form>
+                                        <form action="/dashboard/admin/denuncias/<%= denuncia.id %>/status" method="POST" class="denuncia-form">
+                                            <input type="hidden" name="status" value="rejected">
+                                            <div class="reason-input">
+                                                <input type="text" name="reason" placeholder="Motivo da reprovação" required>
+                                            </div>
+                                            <button type="submit" class="reject-button">Reprovar</button>
+                                        </form>
+                                    </div>
+                                <% } else if (denuncia.reviewedBy) { %>
+                                    <div class="review-info">
+                                        <p>
+                                            <%= denuncia.status === 'approved' ? 'Aprovada' : 'Reprovada' %> 
+                                            por <%= denuncia.reviewedBy %> 
+                                            <%= moment(denuncia.reviewedAt).fromNow() %>
+                                        </p>
+                                        <% if (denuncia.reason) { %>
+                                            <p class="review-reason">Motivo: <%= denuncia.reason %></p>
+                                        <% } %>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="bulkRejectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Reprovar Denúncias</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="bulkRejectForm">
+                    <div class="form-group">
+                        <label for="bulkRejectReason">Motivo da Reprovação</label>
+                        <textarea id="bulkRejectReason" name="reason" required 
+                                placeholder="Digite o motivo para reprovar as denúncias selecionadas"></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="cancel-button" onclick="closeBulkRejectModal()">Cancelar</button>
+                        <button type="submit" class="confirm-button">Confirmar Reprovação</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script>
+    const selectAll = document.getElementById('selectAll');
+    const denunciaCheckboxes = document.querySelectorAll('.denuncia-checkbox');
+    const bulkButtons = document.querySelectorAll('.bulk-approve, .bulk-reject');
+    const bulkRejectModal = document.getElementById('bulkRejectModal');
+
+    selectAll.addEventListener('change', (e) => {
+        denunciaCheckboxes.forEach(checkbox => {
+            checkbox.checked = e.target.checked;
+        });
+        updateBulkButtons();
+    });
+    denunciaCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateBulkButtons);
+    });
+
+    function updateBulkButtons() {
+        const selectedCount = document.querySelectorAll('.denuncia-checkbox:checked').length;
+        bulkButtons.forEach(button => {
+            button.disabled = selectedCount === 0;
+        });
+    }
+
+    async function bulkApprove() {
+        const selectedIds = Array.from(document.querySelectorAll('.denuncia-checkbox:checked'))
+            .map(checkbox => checkbox.dataset.id);
+        
+        try {
+            const response = await fetch('/dashboard/admin/denuncias/bulk-approve', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ids: selectedIds })
+            });
+
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Erro ao aprovar denúncias');
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            alert('Erro ao aprovar denúncias');
+        }
+    }
+
+
+    function bulkReject() {
+        bulkRejectModal.classList.add('active');
+    }
+
+    function closeBulkRejectModal() {
+        bulkRejectModal.classList.remove('active');
+    }
+
+    document.getElementById('bulkRejectForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const selectedIds = Array.from(document.querySelectorAll('.denuncia-checkbox:checked'))
+            .map(checkbox => checkbox.dataset.id);
+        const reason = document.getElementById('bulkRejectReason').value;
+
+        try {
+            const response = await fetch('/dashboard/admin/denuncias/bulk-reject', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    ids: selectedIds,
+                    reason: reason
+                })
+            });
+
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Erro ao reprovar denúncias');
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            alert('Erro ao reprovar denúncias');
+        }
+    });
+    </script>
+
+    <style>
+    .bulk-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(99,102,241,0.1) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+    }
+
+    .select-all {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .select-all label {
+        color: var(--text-primary);
+        font-weight: 500;
+        font-size: 0.95rem;
+        user-select: none;
+        cursor: pointer;
+    }
+
+    .checkbox {
+        appearance: none;
+        width: 22px;
+        height: 22px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.05);
+        cursor: pointer;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .checkbox:checked {
+        background: var(--accent-color);
+        border-color: var(--accent-color);
+    }
+
+    .checkbox:checked::after {
+        content: '✓';
+        position: absolute;
+        color: white;
+        font-size: 14px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .checkbox:hover {
+        border-color: var(--accent-color);
+    }
+
+    .bulk-buttons {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .bulk-buttons button {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.85rem 1.5rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .bulk-buttons button img {
+        width: 20px;
+        height: 20px;
+        filter: brightness(0) invert(1);
+    }
+
+    .bulk-approve {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+    }
+
+    .bulk-reject {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+    }
+
+    .bulk-approve:hover:not(:disabled),
+    .bulk-reject:hover:not(:disabled) {
+        transform: translateY(-2px);
+    }
+
+    .bulk-approve:disabled,
+    .bulk-reject:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .denuncia-card {
+        position: relative;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .denuncia-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .denuncia-select {
+        position: absolute;
+        bottom: 1rem;
+        right: 1rem;
+        z-index: 2;
+    }
+
+    .denuncia-checkbox {
+        appearance: none;
+        width: 24px;
+        height: 24px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        background: rgba(0, 0, 0, 0.5);
+        cursor: pointer;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .denuncia-checkbox:checked {
+        background: var(--accent-color);
+        border-color: var(--accent-color);
+    }
+
+    .denuncia-checkbox:checked::after {
+        content: '✓';
+        position: absolute;
+        color: white;
+        font-size: 16px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .denuncia-checkbox:hover {
+        border-color: var(--accent-color);
+        transform: scale(1.05);
+    }
+
+    .selectable {
+        border-left: 3px solid var(--accent-color);
+        background: linear-gradient(90deg, rgba(99,102,241,0.1) 0%, rgba(0,0,0,0.3) 100%);
+    }
+
+    .denuncia-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    .denuncia-content {
+        padding: 1.5rem;
+    }
+
+    .denuncia-status {
+        padding: 0.5rem 1rem;
+        border-radius: 100px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .denuncia-status.pending {
+        background: rgba(234, 179, 8, 0.1);
+        color: #eab308;
+        border: 1px solid rgba(234, 179, 8, 0.2);
+    }
+
+    .denuncia-status.approved {
+        background: rgba(34, 197, 94, 0.1);
+        color: #22c55e;
+        border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    .denuncia-status.rejected {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .modal {
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+    }
+
+    .modal-content {
+        background: linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(17,17,17,0.95) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal textarea {
+        width: 100%;
+        min-height: 120px;
+        padding: 1rem;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        resize: vertical;
+        transition: all 0.3s ease;
+    }
+
+    .modal textarea:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .cancel-button,
+    .confirm-button {
+        padding: 0.85rem 1.5rem;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .cancel-button {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text-primary);
+    }
+
+    .confirm-button {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        border: none;
+        color: white;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+    }
+
+    .cancel-button:hover,
+    .confirm-button:hover {
+        transform: translateY(-2px);
+    }
+    </style>
+</body>
+</html> 

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= titulo %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script>
+        moment.locale('pt-br');
+    </script>
+</head>
+<body>
+    <%- include('./partials/navbar') %>
+
+    <main>
+        <div class="hero-section">
+            <h1>Scammers Taxados</h1>
+            <p class="subtitle">Confira a lista de golpistas denunciados pela comunidade. Pesquise antes de fazer negócio.</p>
+            
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Pesquisar por nome ou username..">
+                <img src="/images/search-icon.svg" alt="Pesquisar">
+            </div>
+        </div>
+
+        <div class="scammers-section">
+            <div class="section-header">
+                <h2>Scammers Confirmados</h2>
+                <span class="total-count">Total: <%= denuncias.length %></span>
+            </div>
+
+            <div class="scammers-grid">
+                <% if (denuncias.length > 0) { %>
+                    <% denuncias.forEach(denuncia => { %>
+                        <div class="scammer-card" data-scammer-id="<%= denuncia.id %>">
+                            <div class="scammer-header">
+                                <img src="<%= denuncia.avatarUrl %>" 
+                                     alt="Avatar" 
+                                     class="scammer-avatar">
+                                <div class="scammer-info">
+                                    <h3><%= denuncia.scammerName %></h3>
+                                    <span class="scammer-id">ID: <%= denuncia.scammerID %></span>
+                                </div>
+                            </div>
+
+                            <div class="scammer-status">
+                                <span class="status-badge">Scammer Confirmado</span>
+                                <span class="added-date"><%= moment(denuncia.reviewedAt).format('DD/MM/YYYY') %></span>
+                            </div>
+
+                            <div class="scammer-reason">
+                                <h4>Motivo da Denúncia</h4>
+                                <p><%= denuncia.description %></p>
+                            </div>
+
+                            <button class="details-button" onclick="openDetailsModal('<%= denuncia.id %>')">
+                                <img src="/images/details-icon.svg" alt="Ver detalhes">
+                                Ver detalhes
+                            </button>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="empty-state">
+                        <img src="/images/shield-check.svg" alt="Nenhum scammer">
+                        <h3>Nenhum scammer confirmado</h3>
+                        <p>No momento não há scammers confirmados em nossa lista.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </main>
+
+
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detalhes do Scammer</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-scammer-info">
+                    <img src="" alt="Avatar" class="modal-avatar">
+                    <div>
+                        <h3 class="modal-scammer-name"></h3>
+                        <span class="modal-scammer-id"></span>
+                    </div>
+                </div>
+
+                <div class="proof-section">
+                    <h4>Prova</h4>
+                    <div class="modal-proof"></div>
+                </div>
+
+                <div class="description-section">
+                    <h4>Descrição Detalhada</h4>
+                    <p class="modal-description"></p>
+                </div>
+
+                <div class="report-details">
+                    <p class="modal-reporter"></p>
+                    <p class="modal-reviewer"></p>
+                    <p class="modal-date"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script>
+        function openDetailsModal(denunciaId) {
+            const denuncia = <%- JSON.stringify(denuncias) %>.find(d => d.id === denunciaId);
+            const modal = document.getElementById('detailsModal');
+            
+            modal.querySelector('.modal-avatar').src = denuncia.avatarUrl;
+            modal.querySelector('.modal-scammer-name').textContent = denuncia.scammerName;
+            modal.querySelector('.modal-scammer-id').textContent = `ID: ${denuncia.scammerID}`;
+            
+            const proofContainer = modal.querySelector('.modal-proof');
+            if (denuncia.proofType === 'print') {
+                proofContainer.innerHTML = `<img src="${denuncia.proofLink}" alt="Prova" class="proof-image">`;
+            } else {
+                proofContainer.innerHTML = `<a href="${denuncia.proofLink}" target="_blank" class="proof-link">Ver ${denuncia.proofType}</a>`;
+            }
+            
+            modal.querySelector('.modal-description').textContent = denuncia.description;
+            modal.querySelector('.modal-reporter').textContent = `Reportado por ${denuncia.authorName}`;
+            modal.querySelector('.modal-reviewer').textContent = `Aprovado por ${denuncia.reviewedBy}`;
+            modal.querySelector('.modal-date').textContent = `Data: ${moment(denuncia.reviewedAt).format('DD/MM/YYYY HH:mm')}`;
+            
+            modal.classList.add('active');
+        }
+
+        document.querySelector('.close-modal').addEventListener('click', () => {
+            document.getElementById('detailsModal').classList.remove('active');
+        });
+
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('detailsModal');
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const search = e.target.value.toLowerCase();
+            document.querySelectorAll('.scammer-card').forEach(card => {
+                const name = card.querySelector('h3').textContent.toLowerCase();
+                const id = card.querySelector('.scammer-id').textContent.toLowerCase();
+                card.style.display = name.includes(search) || id.includes(search) ? 'block' : 'none';
+            });
+        });
+    </script>
+</body>
+</html> 

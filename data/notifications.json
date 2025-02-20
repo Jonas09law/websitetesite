@@ -1,0 +1,29 @@
+[
+  {
+    "id": "1740065792326",
+    "title": "Nova denúncia recebida",
+    "message": ".vxtz. denunciou Teste",
+    "type": "staff",
+    "userId": null,
+    "createdAt": "2025-02-20T15:36:32.326Z",
+    "read": true
+  },
+  {
+    "id": "1740066093141",
+    "title": "Denúncia atualizada",
+    "message": "Sua denúncia contra Teste foi aprovada",
+    "type": "user",
+    "userId": "1113945518071107705",
+    "createdAt": "2025-02-20T15:41:33.142Z",
+    "read": true
+  },
+  {
+    "id": "1740066134443",
+    "title": "Denúncia revogada",
+    "message": "Sua denúncia contra Teste foi revogada",
+    "type": "user",
+    "userId": "1113945518071107705",
+    "createdAt": "2025-02-20T15:42:14.443Z",
+    "read": true
+  }
+]
