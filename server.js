@@ -28,7 +28,7 @@ app.use(passport.session());
 
 const DISCORD_CLIENT_ID = '1334201431833448518';
 const DISCORD_CLIENT_SECRET = '19AhNM_2zKsmvFeEiXh4KlFYENfE__rR';
-const CALLBACK_URL = 'http://localhost:5000/auth/discord/callback';
+const CALLBACK_URL = 'https://websitetesite-i6te-git-main-marcelo-souzas-projects-6f16c9a6.vercel.app/auth/discord/callback';
 
 passport.use(new DiscordStrategy({
     clientID: DISCORD_CLIENT_ID,
